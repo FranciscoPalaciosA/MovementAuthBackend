@@ -2,7 +2,7 @@
 ------
 
 ### Prerequisites:
-1. clone the repo ``<br>
+1. clone the repo `https://github.com/FranciscoPalaciosA/MovementAuthBackend`<br>
 2. Install [Conda (Miniconda)](https://docs.conda.io/en/latest/miniconda.html)
 3. [Create environment](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) from .yml file: 
 
