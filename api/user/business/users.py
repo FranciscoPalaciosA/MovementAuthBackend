@@ -1,5 +1,5 @@
 from api.utils.fire import get_reference
-from api.utils.totp import generate_seed, generate_secret_key
+from api.utils.totp import generate_seed, generate_secret_key, get_totp_token
 
 import uuid
 
@@ -22,6 +22,19 @@ def create_user(args):
 def does_user_exist(email_to_check):
     users = get_reference('users').get()
     for attr, value in users.items():
-        if value['email'] == email_to_check:
-            return True
+        if value['email'] == email_to_check['email']:
+            return attr
     return False
+
+def is_login_allowed(json):
+    u_id = json['userId']
+    user_key = get_user_key(u_id)
+    sequence = json['sequence']
+    otp = json['otp']
+    correct_otp = get_totp_token(user_key, sequence.split(','))
+    print("Correct otp = ", correct_otp)
+    return otp == correct_otp
+
+def get_user_key(u_id):
+    user = get_reference(f'users/{u_id}').get()
+    return user['secret']
