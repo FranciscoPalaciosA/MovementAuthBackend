@@ -1,0 +1,11 @@
+venv/
+env/
+__pycache__/
+.vscode/
+temp/
+tests/
+tools/
+static/
+.github
+.idea
+README.md

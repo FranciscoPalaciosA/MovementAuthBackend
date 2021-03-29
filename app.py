@@ -8,6 +8,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from api.restplus import api
 from api.user.endpoints.users import ns as users_namespace
+from api.data.endpoints.data import ns as data_namespace
 
 app = Flask(__name__)
 CORS(app)
@@ -15,6 +16,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app)
 api.init_app(app)
 
 api.add_namespace(users_namespace)
+api.add_namespace(data_namespace)
 
 
 if __name__ == '__main__':

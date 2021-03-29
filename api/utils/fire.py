@@ -1,9 +1,7 @@
 import firebase_admin
 from firebase_admin import auth, credentials, db
 
-cred = credentials.Certificate('./service-account-file.json')
-
-default_app = firebase_admin.initialize_app(options={
+default_app = firebase_admin.initialize_app(credential=cred, options={
     'databaseURL': 'https://movementauth-default-rtdb.firebaseio.com/',
 })
 
