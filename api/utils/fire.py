@@ -1,7 +1,7 @@
 import firebase_admin
 from firebase_admin import auth, credentials, db
 
-default_app = firebase_admin.initialize_app(credential=cred, options={
+default_app = firebase_admin.initialize_app(options={
     'databaseURL': 'https://movementauth-default-rtdb.firebaseio.com/',
 })
 

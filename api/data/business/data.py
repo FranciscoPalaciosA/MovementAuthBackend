@@ -11,3 +11,11 @@ def upload_movement(data_obj):
     data = data_obj["movement_data"]
     pushed_ref = ref.push(data)
     return True
+
+def check_movement(data_obj):
+    if 'movement' not in data_obj or 'movement_data' not in data_obj:
+        return False
+    
+    # Run ML 
+    ml_shape = 'Circle'
+    return ml_shape == data_obj['movement']
