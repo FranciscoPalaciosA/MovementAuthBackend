@@ -29,6 +29,8 @@ def does_user_exist(email_to_check):
 def is_login_allowed(json):
     u_id = json['userId']
     user_key = get_user_key(u_id)
+    if user_key == None:
+        return False
     sequence = json['sequence']
     otp = json['otp']
     correct_otp = get_totp_token(user_key, sequence.split(','))
@@ -37,4 +39,6 @@ def is_login_allowed(json):
 
 def get_user_key(u_id):
     user = get_reference(f'users/{u_id}').get()
-    return user['secret']
+    if user is None: return None
+    else:
+        return user['secret']

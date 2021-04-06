@@ -9,7 +9,7 @@ RUN conda install -c conda-forge conda-pack
 
 # Use conda-pack to create a standalone enviornment
 # in /venv:
-RUN conda-pack -n MovementAuthBackend -o /tmp/env.tar && \
+RUN conda-pack -n Back -o /tmp/env.tar && \
   mkdir /venv && cd /venv && tar xf /tmp/env.tar && \
   rm /tmp/env.tar
 
@@ -36,5 +36,4 @@ RUN cp /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 # Create directories
 RUN mkdir soilGrib && mkdir temp && mkdir data
 
-# ENTRYPOINT ["conda", "run", "-n", "apienv", "gunicorn", "-c", "./gunicorn.config.py","--timeout","60", "run:app"]
-ENTRYPOINT source /venv/bin/activate && gunicorn --bind :$PORT -c ./gunicorn.config.py --timeout 60 app:app
+ENTRYPOINT source /venv/bin/activate && gunicorn --bind :$PORT -c ./gunicorn.config.py --timeout 60 main:app

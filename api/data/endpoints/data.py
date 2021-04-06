@@ -28,6 +28,7 @@ class DataCollection(Resource):
         else:
             abort(400, 'Error uploading data')
 
+
 @ns.route('/check-movement')
 class DataCheckCollection(Resource):
     @api.expect(upload_mov_args, validate=False)
@@ -38,6 +39,7 @@ class DataCheckCollection(Resource):
         Checks if a movement is what it's supposed to be.
         """
         return check_movement(request.json)
+
 
 @ns.route('/get-sequence')
 class MovementConversionCollection(Resource):
