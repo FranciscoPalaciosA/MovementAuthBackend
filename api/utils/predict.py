@@ -1,4 +1,6 @@
 import googleapiclient.discovery
+import sys
+import json
 from google.api_core.client_options import ClientOptions
 
 
@@ -31,6 +33,8 @@ def predict_json(instances,
     service = googleapiclient.discovery.build(
         'ml', 'v1', client_options=client_options)
     name = 'projects/{}/models/{}'.format(project, model)
+
+    print("Size = ", sys.getsizeof(json.dumps(instances)))
 
     if version is not None:
         name += '/versions/{}'.format(version)

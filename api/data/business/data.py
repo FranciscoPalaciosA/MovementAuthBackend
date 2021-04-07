@@ -11,12 +11,12 @@ from api.utils.totp import generate_secret_key, generate_seed, get_totp_token
 from matplotlib.figure import Figure
 
 SHAPE_TO_CHAR = {
-    'Circle': 'A',
-    'Diamond': 'D',
-    'Triangle': 'M',
-    'S_Shape': '1',
-    'Infinity': '3',
-    'Square': '9'
+    'Circle': 'F',
+    'Diamond': 'Y',
+    'Triangle': 'N',
+    'S_Shape': '2',
+    'Infinity': '4',
+    'Square': '7'
 }
 
 def upload_movement(data_obj):
@@ -33,8 +33,7 @@ def check_movement(data_obj):
         return False
     image_arr = make_plot(data_obj['movement_data'])
     ml_shape = predict(image_arr)
-    # delete_plot(plot_id)
-    # Run ML
+
     return ml_shape[0] == data_obj['movement']
 
 def convert_to_sequence(data_obj):
@@ -43,8 +42,10 @@ def convert_to_sequence(data_obj):
     
     seq = []
     for item in data_obj['movement_data']:
-        # Run ML for each
-        seq.append(SHAPE_TO_CHAR['Circle'])
+        image_arr = make_plot(item)
+        ml_shape = predict(image_arr)
+        print(ml_shape)
+        seq.append(SHAPE_TO_CHAR[ml_shape[0]])
     return seq
 
 def make_plot(matrix):
