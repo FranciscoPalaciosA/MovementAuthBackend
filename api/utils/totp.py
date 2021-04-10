@@ -9,6 +9,11 @@ TIME_INTERVAL=120
 def get_hotp_token(secret, random_seq, intervals_no):
     secret = secret.replace(random_seq[0], random_seq[1])
     secret = secret.replace(random_seq[2], random_seq[3])
+
+    #print('Secret = ', secret)
+    #print('Random Seq = ', random_seq)
+    print('Time Interval = ', intervals_no)
+
     key = base64.b32decode(secret, True)
     #decoding our key
     msg = struct.pack(">Q", intervals_no)
@@ -21,14 +26,16 @@ def get_hotp_token(secret, random_seq, intervals_no):
     return h
 
 
-def get_totp_token(secret, random_seq, intervals_no = time.time()):
-    #ensuring to give the same otp for 30 seconds
+def get_totp_token(secret, random_seq):
+    #ensuring to give the same otp for 120 seconds
+    unix_time = time.time()
     x =str(
       get_hotp_token(
         secret, 
         random_seq,
-        int(intervals_no)//TIME_INTERVAL, 
+        int(unix_time)//TIME_INTERVAL, 
         ))
+    print("Full Time = ", int(unix_time))
     #adding 0 in the beginning till OTP has 6 digits
     while len(x)!=6:
         x+='0'

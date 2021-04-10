@@ -46,6 +46,8 @@ def convert_to_sequence(data_obj):
         ml_shape = predict(image_arr)
         print(ml_shape)
         seq.append(SHAPE_TO_CHAR[ml_shape[0]])
+
+    print("sequence returned = ", seq)   
     return seq
 
 def make_plot(matrix):
