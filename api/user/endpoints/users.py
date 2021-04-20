@@ -62,6 +62,6 @@ class UserCollectionLogin(Resource):
     @api.response(200, 'Success.')
     def post(self):
         """
-        Endpoint to validate the user's otp
+        Endpoint save results from survey
         """
         return save_results(request.json)
