@@ -2,8 +2,9 @@ import logging
 
 from api.restplus import api
 from api.user.business.users import (create_user, does_user_exist,
-                                    is_login_allowed)
-from api.user.serializers import create_user_args, user_args, login_user_args
+                                    is_login_allowed, save_results)
+from api.user.serializers import (create_user_args, user_args, 
+                                    login_user_args, survey_args)
 from flask import abort, request
 from flask_restplus import Resource
 
@@ -52,3 +53,15 @@ class UserCollectionLogin(Resource):
         """
         login = is_login_allowed(request.json)
         return login
+
+
+@ns.route('/survey')
+class UserCollectionLogin(Resource):
+    @api.expect(survey_args, validate=True)
+    @api.response(400, 'Error getting user')
+    @api.response(200, 'Success.')
+    def post(self):
+        """
+        Endpoint to validate the user's otp
+        """
+        return save_results(request.json)

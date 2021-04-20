@@ -42,3 +42,16 @@ def get_user_key(u_id):
     if user is None: return None
     else:
         return user['secret']
+
+def save_results(json):
+    status = True
+    try:
+        user_survey = get_reference(f'users/{json["userId"]}/survey')
+        if user_survey.get() is not None:
+            json.pop('userId', None)
+            user_survey.update(json)
+        else:
+            status = False
+    except Exception as e:
+        status = False
+    return status

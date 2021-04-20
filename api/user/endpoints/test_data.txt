@@ -1,0 +1,15 @@
+{
+    "userId": "650a4df7-c55d-482b-9e91-0901a8fc6280",
+    "question1": 1,
+    "question2": 2,
+    "question3": 2,
+    "question4": 2,
+    "question5": 2,
+    "question6": 2,
+    "question7": 2,
+    "question8": 2,
+    "question9": 3,
+    "question10": 2,
+    "sum": 20,
+    "total": 50
+}
