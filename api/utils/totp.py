@@ -1,6 +1,7 @@
 # 
 # conda env export -n <env-name> > environment.yml
 
+import logging
 import hmac, base64, struct, hashlib, time, secrets
 
 SEED_LENGTH = 32
@@ -13,6 +14,7 @@ def get_hotp_token(secret, random_seq, intervals_no):
     #print('Secret = ', secret)
     #print('Random Seq = ', random_seq)
     print('Time Interval = ', intervals_no)
+    logging.info('Time Interval = ', intervals_no)
 
     key = base64.b32decode(secret, True)
     #decoding our key
@@ -29,18 +31,21 @@ def get_hotp_token(secret, random_seq, intervals_no):
 def get_totp_token(secret, random_seq):
     #ensuring to give the same otp for 120 seconds
     unix_time = time.time()
-    x =str(
-      get_hotp_token(
-        secret, 
-        random_seq,
-        int(unix_time)//TIME_INTERVAL, 
-        ))
-    print("Full Time = ", int(unix_time))
-    #adding 0 in the beginning till OTP has 6 digits
-    while len(x)!=6:
-        x+='0'
-    return x
+    time_interval = int(unix_time)//TIME_INTERVAL
+    passwords = []
+    for n in range(time_interval - 1, time_interval + 2):
+        x =str(
+        get_hotp_token(
+            secret, 
+            random_seq,
+            n, 
+            ))
 
+        #adding 0 in the beginning till OTP has 6 digits
+        while len(x)!=6:
+            x+='0'
+        passwords.append(x)
+    return passwords
 
 def generate_seed():
     return secrets.token_hex(SEED_LENGTH)

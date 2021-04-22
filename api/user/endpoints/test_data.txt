@@ -1,4 +1,10 @@
 {
+  "userId": "650a4df7-c55d-482b-9e91-0901a8fc6280",
+  "sequence": "F,F,F,F",
+  "otp": "123456"
+}
+
+{
     "userId": "650a4df7-c55d-482b-9e91-0901a8fc6280",
     "question1": 1,
     "question2": 2,

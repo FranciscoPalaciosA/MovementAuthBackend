@@ -73,6 +73,7 @@ def convert_to_sequence(data_obj):
     seq = []
     for pred in predictions:
         seq.append(SHAPE_TO_CHAR[pred])
+    print("SEQ = ", seq)
     return seq
 
 def make_plot(matrix):

@@ -1,3 +1,5 @@
+import logging
+
 from api.utils.fire import get_reference
 from api.utils.totp import generate_seed, generate_secret_key, get_totp_token
 
@@ -32,10 +34,13 @@ def is_login_allowed(json):
     if user_key == None:
         return False
     sequence = json['sequence']
+    print("sequence = ", sequence)
+    logging.info("sequence = ", sequence)
     otp = json['otp']
-    correct_otp = get_totp_token(user_key, sequence.split(','))
-    print("Correct otp = ", correct_otp)
-    return otp == correct_otp
+    correct_otps = get_totp_token(user_key, sequence.split(','))
+    print("Correct otp = ", correct_otps)
+    logging.info("Correct otp = ", correct_otps)
+    return otp in correct_otps
 
 def get_user_key(u_id):
     user = get_reference(f'users/{u_id}').get()
