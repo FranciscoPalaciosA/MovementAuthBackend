@@ -2,8 +2,8 @@ import logging
 
 from api.restplus import api
 from api.data.business.data import (upload_movement, check_movement, 
-                                    convert_to_sequence)
-from api.data.serializers import upload_mov_args
+                                    convert_to_sequence, time_sequence)
+from api.data.serializers import upload_mov_args, time_seq_args
 from flask import abort, request
 from flask_restplus import Resource
 
@@ -51,3 +51,15 @@ class MovementConversionCollection(Resource):
         Returns the sequence of strings to replace
         """
         return convert_to_sequence(request.json)
+
+
+@ns.route('/time-sequence')
+class TimingSequence(Resource):
+    @api.expect(time_seq_args, validate=True)
+    @api.response(400, 'Error uploading data')
+    @api.response(200, 'Success.')
+    def post(self):
+        """
+        Saves the miliseconds it took to get the sequence
+        """
+        return time_sequence(request.json)

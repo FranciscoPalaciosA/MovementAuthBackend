@@ -1,5 +1,7 @@
 import os
 import uuid
+from datetime import datetime
+
 from pathlib import Path
 
 import cv2
@@ -64,6 +66,8 @@ def convert_to_sequence(data_obj):
         return False
     
     instances = []
+
+    start_time = datetime.now()
     for item in data_obj['movement_data']:
         image_arr = make_plot(item)
         compressed_matrix = compress_matrix(image_arr)
@@ -74,6 +78,9 @@ def convert_to_sequence(data_obj):
     for pred in predictions:
         seq.append(SHAPE_TO_CHAR[pred])
     print("SEQ = ", seq)
+    end_time = datetime.now()
+    time_sequence(end_time - start_time)
+
     return seq
 
 def make_plot(matrix):
@@ -99,4 +106,11 @@ def predict_multiple(instances):
 def predict(instance):
     return predict_json(instance.tolist(), 'V2')
     
-    
+def time_sequence(ms):
+    try:
+        ref = get_reference('sequence_timing')
+        ref.push({'ms': ms.total_seconds() * 1000})
+        return True
+    except Exception as e:
+        print("Error ocurred on saving time = ", e)
+        return False
