@@ -1,12 +1,12 @@
+import io
+import logging
 import os
 import uuid
 from datetime import datetime
-
 from pathlib import Path
 
 import cv2
 import numpy as np
-import io
 from api.utils.fire import get_reference
 from api.utils.predict import predict_json
 from api.utils.totp import generate_secret_key, generate_seed, get_totp_token
@@ -56,10 +56,15 @@ def check_movement(data_obj):
         return False
     image_arr = make_plot(data_obj['movement_data'])
     compressed_matrix = compress_matrix(image_arr)
-    print("compressed matrix = ", compressed_matrix)
-    ml_shape = predict(compressed_matrix.reshape(1,-1))
 
-    return ml_shape[0] == data_obj['movement']
+    ml_shape = predict(compressed_matrix.reshape(1,-1))
+    
+    is_movement_correct = ml_shape[0] == data_obj['movement']
+
+    if is_movement_correct:
+        upload_movement(data_obj)
+
+    return is_movement_correct
 
 def convert_to_sequence(data_obj):
     if 'movement_data' not in data_obj:
@@ -77,10 +82,10 @@ def convert_to_sequence(data_obj):
     seq = []
     for pred in predictions:
         seq.append(SHAPE_TO_CHAR[pred])
-    print("SEQ = ", seq)
     end_time = datetime.now()
     time_sequence(end_time - start_time)
 
+    logging.info("sequence returned = ", seq)
     return seq
 
 def make_plot(matrix):

@@ -34,15 +34,15 @@ def is_login_allowed(json):
     if user_key == None:
         return False
     sequence = json['sequence']
-    print("sequence = ", sequence)
-    logging.info("sequence = ", sequence)
+
     otp = json['otp']
     correct_otps = get_totp_token(user_key, sequence.split(','))
-    print("Correct otp = ", correct_otps)
-    logging.info("Correct otp = ", correct_otps)
 
     login_allowed = otp in correct_otps
     register_attempt(login_allowed, u_id)
+
+    logging.info("sequence sent = ", sequence)
+    logging.info("Correct otp = ", correct_otps)
 
     return login_allowed
 

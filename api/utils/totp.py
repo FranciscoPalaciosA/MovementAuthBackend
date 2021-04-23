@@ -11,9 +11,6 @@ def get_hotp_token(secret, random_seq, intervals_no):
     secret = secret.replace(random_seq[0], random_seq[1])
     secret = secret.replace(random_seq[2], random_seq[3])
 
-    #print('Secret = ', secret)
-    #print('Random Seq = ', random_seq)
-    print('Time Interval = ', intervals_no)
     logging.info('Time Interval = ', intervals_no)
 
     key = base64.b32decode(secret, True)
