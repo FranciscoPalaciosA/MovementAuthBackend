@@ -38,7 +38,7 @@ class UserCollectionCheckExists(Resource):
         """
         Creates a user in the db and returns it secret key 
         """
-        exists = does_user_exist(request.json)
+        exists = does_user_exist(request.json['email'])
         return exists
 
 

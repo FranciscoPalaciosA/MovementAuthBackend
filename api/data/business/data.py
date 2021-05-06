@@ -43,13 +43,25 @@ def compress_matrix(matrix):
             compressed_matrix[i][j] = get_avg(nums_to_avg)
     return compressed_matrix
 
-def upload_movement(data_obj):
+def upload_movement_on_user(data_obj, uid, success):
     if 'movement' not in data_obj or 'movement_data' not in data_obj:
         return False
-    ref = get_reference(f'data/{data_obj["movement"]}')
+    ref = get_reference(f'/users_data/{uid}/{data_obj["movement"]}')
     data = data_obj["movement_data"]
+    now = datetime.now()
+    timestamp = datetime.timestamp(now)
+    pushed_ref = ref.push({'data': data, 'timestamp': timestamp, 'success': success})
+    return True
+
+def upload_movement(data_obj):
+    ref = get_reference(f'get_password_data/')
+    data = data_obj
     pushed_ref = ref.push(data)
     return True
+
+def upload_attempt(shape, success):
+    ref = get_reference(f'attempts_by_shape/{shape}')
+    pushed_ref = ref.push(success)
 
 def check_movement(data_obj):
     if 'movement' not in data_obj or 'movement_data' not in data_obj:
@@ -60,9 +72,10 @@ def check_movement(data_obj):
     ml_shape = predict(compressed_matrix.reshape(1,-1))
     
     is_movement_correct = ml_shape[0] == data_obj['movement']
+    
+    upload_movement_on_user(data_obj, data_obj['userId'], is_movement_correct)
+    upload_attempt(data_obj['movement'], is_movement_correct)
 
-    if is_movement_correct:
-        upload_movement(data_obj)
 
     return is_movement_correct
 
@@ -74,6 +87,7 @@ def convert_to_sequence(data_obj):
 
     start_time = datetime.now()
     for item in data_obj['movement_data']:
+        upload_movement(item)
         image_arr = make_plot(item)
         compressed_matrix = compress_matrix(image_arr)
         compressed_matrix = compressed_matrix.reshape(1, -1)

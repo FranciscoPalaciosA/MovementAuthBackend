@@ -19,12 +19,12 @@ def create_user(args):
     u_id = uuid.uuid4()
     ref = get_reference(f'users/{u_id}')
     ref.set(user)
-    return f'email:{args["email"]}-secret:{secret}'
+    return f'email:{args["email"]}-secret:{secret}-uid:{u_id}'
 
 def does_user_exist(email_to_check):
     users = get_reference('users').get()
     for attr, value in users.items():
-        if value['email'] == email_to_check['email']:
+        if value['email'] == email_to_check:
             return attr
     return False
 
