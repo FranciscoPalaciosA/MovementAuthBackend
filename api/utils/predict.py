@@ -34,6 +34,7 @@ def predict_json(instances,
         'ml', 'v1', client_options=client_options)
     name = 'projects/{}/models/{}'.format(project, model)
 
+    version = "V3"
     if version is not None:
         name += '/versions/{}'.format(version)
     response = service.projects().predict(
@@ -43,5 +44,5 @@ def predict_json(instances,
 
     if 'error' in response:
         raise RuntimeError(response['error'])
-
+    print(response['predictions'])
     return response['predictions']

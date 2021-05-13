@@ -1,4 +1,5 @@
 import io
+import sys
 import logging
 import os
 import uuid
@@ -10,7 +11,10 @@ import numpy as np
 from api.utils.fire import get_reference
 from api.utils.predict import predict_json
 from api.utils.totp import generate_secret_key, generate_seed, get_totp_token
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+
+np.set_printoptions(threshold=sys.maxsize)
 
 SHAPE_TO_CHAR = {
     'Circle': 'F',
@@ -25,7 +29,7 @@ def get_avg(arr):
     s = 0
     for i in arr:
         s = s + i
-    return 255 -  s / len(arr)
+    return 255 - s / len(arr)
 
 def compress_matrix(matrix):
     h, w = matrix.shape
@@ -40,7 +44,7 @@ def compress_matrix(matrix):
             for k in range(4):
                 for l in range(4):
                     nums_to_avg.append(matrix[i * jump + k][j * jump + l])
-            compressed_matrix[i][j] = get_avg(nums_to_avg)
+            compressed_matrix[i][j] = int(get_avg(nums_to_avg))
     return compressed_matrix
 
 def upload_movement_on_user(data_obj, uid, success):
@@ -63,14 +67,36 @@ def upload_attempt(shape, success):
     ref = get_reference(f'attempts_by_shape/{shape}')
     pushed_ref = ref.push(success)
 
+def create_graph(matrix):
+    fig = Figure()
+    ax = fig.subplots()
+    ax.plot(matrix['x'], matrix['z'])
+    ax.axis('off')
+
+    # Write img matrix in memory
+    io_buf = io.BytesIO()
+    fig.savefig(io_buf, format='raw')
+    io_buf.seek(0)
+    img_arr = np.reshape(np.frombuffer(io_buf.getvalue(), dtype=np.uint8),
+                        newshape=(int(fig.bbox.bounds[3]), int(fig.bbox.bounds[2]), -1))
+    io_buf.close()
+
+    # Change to gray 
+    gray = cv2.cvtColor(img_arr, cv2.COLOR_BGR2GRAY)
+    compressed_matrix = compress_matrix(gray)
+
+    path = f'./compress/shape/'
+    Path(path).mkdir(parents=True, exist_ok=True)
+    
+    # Save image
+    cv2.imwrite(path + f'/rwar.png', compressed_matrix)
+
 def check_movement(data_obj):
     if 'movement' not in data_obj or 'movement_data' not in data_obj:
         return False
     image_arr = make_plot(data_obj['movement_data'])
-    compressed_matrix = compress_matrix(image_arr)
-
-    ml_shape = predict(compressed_matrix.reshape(1,-1))
-    
+    compressed_matrix = compress_matrix(image_arr).astype(int).reshape(1,-1)
+    ml_shape = predict(compressed_matrix)    
     is_movement_correct = ml_shape[0] == data_obj['movement']
     
     upload_movement_on_user(data_obj, data_obj['userId'], is_movement_correct)
@@ -114,7 +140,6 @@ def make_plot(matrix):
     img_arr = np.reshape(np.frombuffer(io_buf.getvalue(), dtype=np.uint8),
                         newshape=(int(fig.bbox.bounds[3]), int(fig.bbox.bounds[2]), -1))
     io_buf.close()
-    
     grayed_img = cv2.cvtColor(img_arr, cv2.COLOR_BGR2GRAY)
     return grayed_img
     
