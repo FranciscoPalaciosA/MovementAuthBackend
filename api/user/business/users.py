@@ -56,11 +56,8 @@ def save_results(json):
     status = True
     try:
         user_survey = get_reference(f'users/{json["userId"]}/survey')
-        if user_survey.get() is not None:
-            json.pop('userId', None)
-            user_survey.update(json)
-        else:
-            status = False
+        json.pop('userId', None)
+        user_survey.set(json)
     except Exception as e:
         status = False
     return status
