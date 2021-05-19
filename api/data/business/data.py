@@ -1,10 +1,10 @@
 import io
 import sys
 import logging
-import os
-import uuid
 from datetime import datetime
 from pathlib import Path
+import tensorflow as tf
+from tensorflow import keras
 
 import cv2
 import numpy as np
@@ -102,7 +102,6 @@ def check_movement(data_obj):
     upload_movement_on_user(data_obj, data_obj['userId'], is_movement_correct)
     upload_attempt(data_obj['movement'], is_movement_correct)
 
-
     return is_movement_correct
 
 def convert_to_sequence(data_obj):
@@ -140,10 +139,11 @@ def make_plot(matrix):
     img_arr = np.reshape(np.frombuffer(io_buf.getvalue(), dtype=np.uint8),
                         newshape=(int(fig.bbox.bounds[3]), int(fig.bbox.bounds[2]), -1))
     io_buf.close()
+    print("make_plot - img arr =", img_arr.shape)
     grayed_img = cv2.cvtColor(img_arr, cv2.COLOR_BGR2GRAY)
+    print("make_plot - greyed image =", grayed_img.shape)
     return grayed_img
     
-
 def predict_multiple(instances):
     return predict_json(instances, 'V2')
 
@@ -158,3 +158,67 @@ def time_sequence(ms):
     except Exception as e:
         print("Error ocurred on saving time = ", e)
         return False
+
+
+img_height = 160
+img_width = 140
+movements = [
+        'Circle',
+        'Diamond',
+        'Infinity',
+        'S_Shape',
+        'Square',
+        'Triangle',
+        ]
+def improved_check_movement(data_obj):
+    if 'movement_data' not in data_obj:
+        return False
+    
+    model = tf.keras.models.load_model('./CNNModel')
+
+    plot_data(data_obj['movement_data'])
+    img = tf.keras.preprocessing.image.load_img(
+            './improved_shapes/shape_movement.png',
+            target_size=(img_height, img_width)
+            )
+    img_array = keras.preprocessing.image.img_to_array(img)
+    img_array = tf.expand_dims(img_array, 0)
+    prediction = model.predict(img_array)
+    score = tf.nn.softmax(prediction[0])
+    return movements[np.argmax(score)]
+
+def plot_data(matrix):
+    fig = Figure()
+    ax = fig.subplots()
+    ax.plot(matrix['x'], matrix['z'])
+    ax.axis('off')
+
+    # Write img matrix in memory
+    io_buf = io.BytesIO()
+    fig.savefig(io_buf, format='raw')
+    io_buf.seek(0)
+    img_arr = np.reshape(np.frombuffer(io_buf.getvalue(), dtype=np.uint8),
+                        newshape=(int(fig.bbox.bounds[3]), int(fig.bbox.bounds[2]), -1))
+    io_buf.close()
+
+    # Change to gray 
+    gray = cv2.cvtColor(img_arr, cv2.COLOR_BGR2GRAY)
+    compressed_matrix = compress_matrix(gray)
+
+    path = f'./improved_shapes'
+    Path(path).mkdir(parents=True, exist_ok=True)
+    
+    # Save image
+    cv2.imwrite(path + f'/shape_movement.png', compressed_matrix)
+
+def improved_get_sequence(data_obj):
+    if 'movement_data' not in data_obj:
+        return False
+    seq = []
+    for item in data_obj['movement_data']:
+        shape_predicted = improved_check_movement({'movement_data': item})
+        print("shape_predicted = ", shape_predicted)
+        seq.append(SHAPE_TO_CHAR[shape_predicted])
+        
+    logging.info("sequence returned = ", seq)
+    return seq
